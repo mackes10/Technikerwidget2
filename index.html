@@ -25,12 +25,13 @@
   </div>
 
   <script>
-    (function() {
+    (function () {
       const DROPDOWN_ID = "mitarbeiter";
       const FLOW_URL = "https://prod-86.westeurope.logic.azure.com:443/workflows/2e0a97d831874a0288bf9e6ce0e65fad/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=CsOAnwfwyiFSphxxAwLl0dY1P-jbSxARv_58dDRWPMU";
 
       const select = document.getElementById(DROPDOWN_ID);
 
+      // Dropdown füllen
       async function ladeMitarbeiter() {
         select.innerHTML = '<option disabled class="text-gray-500 italic">Lade Daten...</option>';
 
@@ -63,30 +64,48 @@
         }
       }
 
-      // Eventlistener mit Debug-Ausgabe
-      select.addEventListener("change", function() {
+      // Auswahländerung
+      select.addEventListener("change", function () {
         const wert = select.value;
         console.log("Ausgewählter Mitarbeiter:", wert);
-        window.JF?.setValue(wert); // Übergibt an Jotform
+
+        // Übergabe an Jotform Standard (falls benötigt)
+        window.JF?.setValue(wert);
+
+        // Übergabe an Jotform Widget-Engine
+        if (window.JFCustomWidget) {
+          window.JFCustomWidget.setValue(wert);
+          window.JFCustomWidget.sendData({ value: wert });
+        }
       });
 
-      // Jotform Widget SDK Methoden definieren:
+      // Jotform get/set Value Unterstützung (optional für Tests)
       window.JF = window.JF || {};
-
-      window.JF.setValue = function(value) {
+      window.JF.setValue = function (value) {
         if (value) {
           select.value = value;
         } else {
           select.selectedIndex = 0;
         }
       };
-
-      window.JF.getValue = function() {
+      window.JF.getValue = function () {
         return select.value;
       };
 
-      // Lade Daten beim Start
+      // Wichtige Registrierung für das Widget
+      if (window.JFCustomWidget) {
+        window.JFCustomWidget.subscribe("ready", function () {
+          window.JFCustomWidget.setValue(select.value);
+        });
+
+        window.JFCustomWidget.subscribe("getWidgetValue", function () {
+          window.JFCustomWidget.sendData({ value: select.value });
+        });
+      }
+
+      // Initialer Aufruf
       ladeMitarbeiter();
+
     })();
   </script>
 </body>
