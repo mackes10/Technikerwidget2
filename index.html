@@ -58,16 +58,11 @@
         });
 
         // Änderung: Wert an das Formular zurückgeben
-        select.addEventListener("change", (event) => {
-          const ausgewählt = event.target.value;
-          window.parent.postMessage(
-            {
-              action: "submissionValue",
-              value: ausgewählt
-            },
-            "*"
-          );
-        });
+       select.addEventListener("change", (event) => {
+  const ausgewählt = event.target.value;
+  window.parent.postMessage(ausgewählt, "*");
+});
+
 
       } catch (error) {
         console.error("Fehler beim Abruf:", error);
