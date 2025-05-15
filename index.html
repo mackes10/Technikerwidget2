@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Mitarbeiterauswahl</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* Custom dropdown arrow */
     select {
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat;
@@ -29,11 +30,9 @@
     const DROPDOWN_ID = "mitarbeiter";
     const FLOW_URL = "https://prod-86.westeurope.logic.azure.com:443/workflows/2e0a97d831874a0288bf9e6ce0e65fad/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=CsOAnwfwyiFSphxxAwLl0dY1P-jbSxARv_58dDRWPMU";
 
-    let selectedValue = "";
-
     async function ladeMitarbeiter() {
       const select = document.getElementById(DROPDOWN_ID);
-      select.innerHTML = '<option disabled selected>Lade Daten...</option>';
+      select.innerHTML = '<option disabled class="text-gray-500 italic">Lade Daten...</option>';
 
       try {
         const response = await fetch(FLOW_URL, {
@@ -51,47 +50,34 @@
           return nameA.localeCompare(nameB);
         });
 
-        select.innerHTML = '<option disabled selected>Bitte auswählen</option>';
+        select.innerHTML = '<option disabled selected class="text-gray-400">Bitte auswählen</option>';
         mitarbeiterListe.forEach(eintrag => {
-          const name = eintrag.Benutzername || "Unbenannt";
-          const option = new Option(name, name);
+          const option = new Option(eintrag.Benutzername || "Unbenannt", eintrag.Benutzername);
+          option.className = "text-gray-700";
           select.add(option);
         });
 
-        // Event Listener für Auswahl
-        select.addEventListener("change", (e) => {
-          selectedValue = e.target.value;
-          sendValueToJotform(selectedValue);
+        // Event Listener hinzufügen für Auswahl → Wert an Jotform senden
+        select.addEventListener("change", (event) => {
+          const ausgewählt = event.target.value;
+
+          // Nachricht an Parent (z.B. für eigene Tests)
+          window.parent.postMessage({
+            type: "mitarbeiter-auswahl",
+            value: ausgewählt
+          }, "*");
+
+          // Wert an Jotform-Formular zurückgeben (Feldname 'Mitarbeitername_T1')
+          if (window.JotForm) {
+            window.JotForm.setFieldValue('Mitarbeitername_T1', ausgewählt);
+          }
         });
 
       } catch (error) {
         console.error("Fehler beim Abruf:", error);
-        select.innerHTML = '<option disabled>Fehler beim Laden</option>';
+        select.innerHTML = '<option disabled class="text-red-600 italic">Fehler beim Laden</option>';
       }
     }
-
-    // Sende Daten an Jotform
-    function sendValueToJotform(value) {
-      const msg = {
-        action: "submissionData",
-        value: value
-      };
-      window.parent.postMessage(JSON.stringify(msg), "*");
-    }
-
-    // Jotform fragt den Wert aktiv ab → hier darauf reagieren
-    window.addEventListener("message", function (event) {
-      let data;
-      try {
-        data = JSON.parse(event.data);
-      } catch (e) {
-        return;
-      }
-
-      if (data && data.action === "getSubmissionData") {
-        sendValueToJotform(selectedValue);
-      }
-    });
 
     ladeMitarbeiter();
   </script>
