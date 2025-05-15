@@ -29,6 +29,8 @@
     const DROPDOWN_ID = "mitarbeiter";
     const FLOW_URL = "https://prod-86.westeurope.logic.azure.com:443/workflows/2e0a97d831874a0288bf9e6ce0e65fad/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=CsOAnwfwyiFSphxxAwLl0dY1P-jbSxARv_58dDRWPMU";
 
+    let selectedValue = "";
+
     async function ladeMitarbeiter() {
       const select = document.getElementById(DROPDOWN_ID);
       select.innerHTML = '<option disabled class="text-gray-500 italic">Lade Daten...</option>';
@@ -53,22 +55,27 @@
         mitarbeiterListe.forEach(eintrag => {
           const name = eintrag.Benutzername || "Unbenannt";
           const option = new Option(name, name);
-          option.className = "text-gray-700";
           select.add(option);
         });
 
-        // Änderung: Wert an das Formular zurückgeben
-       select.addEventListener("change", (event) => {
-  const ausgewählt = event.target.value;
-  window.parent.postMessage(ausgewählt, "*");
-});
-
+        // Sende Auswahl direkt an Jotform, wenn geändert
+        select.addEventListener("change", (event) => {
+          selectedValue = event.target.value;
+          window.parent.postMessage(selectedValue, "*");
+        });
 
       } catch (error) {
         console.error("Fehler beim Abruf:", error);
         select.innerHTML = '<option disabled class="text-red-600 italic">Fehler beim Laden</option>';
       }
     }
+
+    // Reagiere auf Anfrage von Jotform nach dem aktuellen Wert
+    window.addEventListener("message", function(event) {
+      if (event.data && event.data.type === "getSubmissionData") {
+        window.parent.postMessage(selectedValue, "*");
+      }
+    });
 
     ladeMitarbeiter();
   </script>
