@@ -16,16 +16,35 @@
   <script>
     const select = document.getElementById("mitarbeiter");
 
-    // Sobald sich Auswahl ändert, sende den Wert an Jotform-Parent
+    // Funktion um Widget-Wert zu setzen - funktioniert mit Jotform
+    function setWidgetValue(value) {
+      if (window.JotForm && typeof window.JotForm.setWidgetValue === "function") {
+        window.JotForm.setWidgetValue(value);
+      } else if (window.widgetAPI && typeof window.widgetAPI.setValue === "function") {
+        window.widgetAPI.setValue(value);
+      } else {
+        // Fallback: Sende PostMessage an Parent
+        parent.postMessage({
+          type: "control_widget",
+          name: "value",
+          value: value
+        }, "*");
+      }
+    }
+
     select.addEventListener("change", () => {
       const selectedValue = select.value;
       console.log("Sende Wert:", selectedValue);
 
-      parent.postMessage({
-        type: "control_widget",
-        name: "value",      // wichtig: "value" muss exakt so heißen
-        value: selectedValue // der Wert wird an Jotform zurückgegeben
-      }, "*");
+      // Wert setzen
+      setWidgetValue(selectedValue);
+    });
+
+    // Optional: Widget initialisieren, falls Wert bereits gesetzt wurde
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'control_widget' && event.data.name === 'value') {
+        select.value = event.data.value;
+      }
     });
   </script>
 </body>
