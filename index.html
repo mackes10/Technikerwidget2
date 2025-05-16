@@ -2,8 +2,12 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Mitarbeiter Auswahl Widget</title>
+  <title>Dropdown Widget</title>
   <style>
+    body {
+      font-family: sans-serif;
+      padding: 10px;
+    }
     select {
       width: 100%;
       padding: 8px;
@@ -14,62 +18,23 @@
   </style>
 </head>
 <body>
-  <label for="mitarbeiter">Mitarbeiter auswählen:</label>
-  <select id="mitarbeiter">
-    <option value="" disabled selected>Bitte auswählen</option>
-   	<option>Franz Brunner</option>
-    <option>Antje von Lengerken</option>
-    <option>Rene Gieler</option>
-    <option>Markus Jasper</option>
-    <option>Ines Pöhler</option>
-    <option>Matthias Illenseer</option>
-    <option>Ralf Hesse</option>
-    <option>Alfred Scheibler</option>
-    <option>Mikail Polat</option>
-    <option>Marvin Glarmin</option>
-    <option>Andre Hentschke</option>
-    <option>Tobias Krüger</option>
-    <option>Mohamad Hmayed</option>
-    <option>Adam Jularic</option>
-    <option>Hans-Jürgen Gruben</option>
-    <option>Karsten Bengsch</option>
-    <option>Moritz Lauterbach</option>
-    <option>Sebastian Röder</option>
-    <option>Sebastian Seidel</option>
-    <option>Mario Pöhler</option>
-    <option>Andre Hammelmann</option>
-    <option>Dirk Bettenwort</option>
-    <option>Sante Di Mauro</option>
-    <option>Lukas Rempel</option>
-    <option>Cristian Hodos-Dumitru</option>
-    <option>Filip Derek</option>
-    <option>Hassan Hmayed</option>
-    <option>Benjamin Hmayed</option>
-    <option>Deividas Cesonis</option>
-    <option>Tim Fast</option>
-    <option>Thomas Miliopoulou</option>
-    <option>Uwe Dönch</option>
-    <option>Michael Collier</option>
-    <option>Sascha Mir</option>
-    <option>Alicia Collier</option>
-    <option>Ina Colllier</option>
-    <option>Thomas Eckert</option>
+  <label for="optionSelector">Bitte eine Option wählen:</label>
+  <select id="optionSelector">
+    <option value="" disabled selected>Auswählen...</option>
+    <option value="Option A">Option A</option>
+    <option value="Option B">Option B</option>
+    <option value="Option C">Option C</option>
   </select>
 
   <script>
-    const select = document.getElementById('mitarbeiter');
+    const selector = document.getElementById('optionSelector');
 
-    select.addEventListener('change', () => {
-      const selected = select.value;
-
-      // An Jotform den gewählten Wert senden:
-      window.parent.postMessage(
-        {
-          action: 'widget-complete',
-          value: selected,
-        },
-        '*'
-      );
+    selector.addEventListener('change', function () {
+      const selectedValue = selector.value;
+      window.parent.postMessage({
+        action: 'widget-complete',
+        value: selectedValue
+      }, '*');
     });
   </script>
 </body>
