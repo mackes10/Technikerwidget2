@@ -17,7 +17,7 @@
   <label for="mitarbeiter">Mitarbeiter auswählen:</label>
   <select id="mitarbeiter">
     <option value="" disabled selected>Bitte auswählen</option>
-    <option>Franz Brunner</option>
+   	<option>Franz Brunner</option>
     <option>Antje von Lengerken</option>
     <option>Rene Gieler</option>
     <option>Markus Jasper</option>
@@ -60,15 +60,16 @@
     const select = document.getElementById('mitarbeiter');
 
     select.addEventListener('change', () => {
-      const wert = select.value;
+      const selected = select.value;
 
-      // Wert im Widget intern speichern (Jotform API)
-      if(window.JF && typeof window.JF.setValue === 'function') {
-        window.JF.setValue(wert);
-      }
-
-      // Optional: Wert an Parent senden (z.B. für Debugging)
-      window.parent.postMessage({ type: 'mitarbeiter-auswahl', value: wert }, '*');
+      // An Jotform den gewählten Wert senden:
+      window.parent.postMessage(
+        {
+          action: 'widget-complete',
+          value: selected,
+        },
+        '*'
+      );
     });
   </script>
 </body>
