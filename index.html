@@ -1,37 +1,31 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Techniker Dropdown</title>
+  <meta charset="UTF-8" />
+  <title>Technikerwidget2</title>
 </head>
 <body>
-  <label for="dropdown">Mitarbeiter auswählen:</label>
-  <select id="dropdown">
-    <option value="">Bitte wählen…</option>
+  <label for="mitarbeiter">Mitarbeiter auswählen:</label>
+  <select id="mitarbeiter" name="value">
+    <option value="">Bitte auswählen</option>
     <option value="Option A">Option A</option>
     <option value="Option B">Option B</option>
     <option value="Option C">Option C</option>
   </select>
 
   <script>
-    const dropdown = document.getElementById("dropdown");
+    const select = document.getElementById("mitarbeiter");
 
-    dropdown.addEventListener("change", function () {
-      const selected = dropdown.value;
+    // Sobald sich Auswahl ändert, sende den Wert an Jotform-Parent
+    select.addEventListener("change", () => {
+      const selectedValue = select.value;
+      console.log("Sende Wert:", selectedValue);
 
-      // Sende den Wert an Jotform
       parent.postMessage({
         type: "control_widget",
-        name: "value",
-        value: selected
+        name: "value",      // wichtig: "value" muss exakt so heißen
+        value: selectedValue // der Wert wird an Jotform zurückgegeben
       }, "*");
-    });
-
-    // Optional: Setze vorhandenen Wert beim Laden
-    window.addEventListener("message", function (event) {
-      if (event.data?.type === "setvalue" && event.data?.value) {
-        dropdown.value = event.data.value;
-      }
     });
   </script>
 </body>
