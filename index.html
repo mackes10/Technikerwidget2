@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Mitarbeiterauswahl</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -26,76 +26,43 @@
   </div>
 
   <script>
-    const DROPDOWN_ID = "mitarbeiter";
-
     const mitarbeiterListe = [
-      "Franz Brunner",
-      "Antje von Lengerken",
-      "Rene Gieler",
-      "Markus Jasper",
-      "Ines Pöhler",
-      "Matthias Illenseer",
-      "Ralf Hesse",
-      "Alfred Scheibler",
-      "Mikail Polat",
-      "Marvin Glarmin",
-      "Andre Hentschke",
-      "Tobias Krüger",
-      "Mohamad Hmayed",
-      "Adam Jularic",
-      "Hans-Jürgen Gruben",
-      "Karsten Bengsch",
-      "Moritz Lauterbach",
-      "Sebastian Röder",
-      "Sebastian Seidel",
-      "Mario Pöhler",
-      "Andre Hammelmann",
-      "Dirk Bettenwort",
-      "Sante Di Mauro",
-      "Lukas Rempel",
-      "Cristian Hodos-Dumitru",
-      "Filip Derek",
-      "Hassan Hmayed",
-      "Benjamin Hmayed",
-      "Deividas Cesonis",
-      "Tim Fast",
-      "Thomas Miliopoulou",
-      "Uwe Dönch",
-      "Michael Collier",
-      "Sascha Mir",
-      "Alicia Collier",
-      "Ina Colllier",
-      "ThomasEckert"
+      "Franz Brunner", "Antje von Lengerken", "Rene Gieler", "Markus Jasper", "Ines Pöhler",
+      "Matthias Illenseer", "Ralf Hesse", "Alfred Scheibler", "Mikail Polat", "Marvin Glarmin",
+      "Andre Hentschke", "Tobias Krüger", "Mohamad Hmayed", "Adam Jularic", "Hans-Jürgen Gruben",
+      "Karsten Bengsch", "Moritz Lauterbach", "Sebastian Röder", "Sebastian Seidel", "Mario Pöhler",
+      "Andre Hammelmann", "Dirk Bettenwort", "Sante Di Mauro", "Lukas Rempel", "Cristian Hodos-Dumitru",
+      "Filip Derek", "Hassan Hmayed", "Benjamin Hmayed", "Deividas Cesonis", "Tim Fast",
+      "Thomas Miliopoulou", "Uwe Dönch", "Michael Collier", "Sascha Mir", "Alicia Collier",
+      "Ina Colllier", "ThomasEckert"
     ];
 
-    function initialisiereDropdown() {
-      const select = document.getElementById(DROPDOWN_ID);
-      select.innerHTML = '<option disabled selected class="text-gray-400">Bitte auswählen</option>';
+    const select = document.getElementById("mitarbeiter");
 
-      mitarbeiterListe.sort((a, b) => a.localeCompare(b));
-      mitarbeiterListe.forEach(name => {
-        const option = new Option(name, name);
-        option.className = "text-gray-700";
-        select.add(option);
-      });
+    // Dropdown mit Namen befüllen
+    mitarbeiterListe.sort().forEach(name => {
+      const option = new Option(name, name);
+      select.add(option);
+    });
 
-      // EventListener für Auswahl
-      select.addEventListener("change", function () {
-        const wert = select.value;
-        console.log("Ausgewählter Mitarbeiter:", wert);
+    // Auswahlereignis verarbeiten
+    select.addEventListener("change", function () {
+      const wert = select.value;
+      console.log("Ausgewählter Mitarbeiter:", wert);
 
-        // Jotform-Integration
-        if (window.JF && typeof window.JF.setValue === "function") {
-          window.JF.setValue(wert);
-          console.log("Wert an Jotform übergeben.");
-        } else {
-          console.warn("window.JF.setValue nicht verfügbar.");
-        }
-      });
-    }
+      // Übergabe an Jotform (damit es in Widget-Feld erscheint)
+      if (window.JF && typeof window.JF.setValue === "function") {
+        window.JF.setValue(wert);
+      } else {
+        console.warn("window.JF.setValue nicht verfügbar");
+      }
 
-    // Initialisieren
-    document.addEventListener("DOMContentLoaded", initialisiereDropdown);
+      // Optional: auch an parent posten (falls nötig)
+      window.parent.postMessage({
+        type: "mitarbeiter-auswahl",
+        value: wert
+      }, "*");
+    });
   </script>
 </body>
 </html>
