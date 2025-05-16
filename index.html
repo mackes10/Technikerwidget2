@@ -3,9 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <title>Technikerwidget2</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 10px;
+    }
+    label, select {
+      font-size: 16px;
+    }
+  </style>
 </head>
 <body>
   <label for="mitarbeiter">Mitarbeiter auswählen:</label>
+  <br />
   <select id="mitarbeiter" name="value">
     <option value="">Bitte auswählen</option>
     <option value="Option A">Option A</option>
@@ -16,14 +26,15 @@
   <script>
     const select = document.getElementById("mitarbeiter");
 
-    // Funktion um Widget-Wert zu setzen - funktioniert mit Jotform
+    // Funktion, um den Widget-Wert an Jotform zu übergeben
     function setWidgetValue(value) {
       if (window.JotForm && typeof window.JotForm.setWidgetValue === "function") {
-        window.JotForm.setWidgetValue(value);
+        // WICHTIG: 'value' ist der erwartete Feldname in Jotform
+        window.JotForm.setWidgetValue('value', value);
       } else if (window.widgetAPI && typeof window.widgetAPI.setValue === "function") {
         window.widgetAPI.setValue(value);
       } else {
-        // Fallback: Sende PostMessage an Parent
+        // Fallback per postMessage
         parent.postMessage({
           type: "control_widget",
           name: "value",
@@ -32,17 +43,16 @@
       }
     }
 
+    // Event-Handler für Auswahländerung
     select.addEventListener("change", () => {
       const selectedValue = select.value;
       console.log("Sende Wert:", selectedValue);
-
-      // Wert setzen
       setWidgetValue(selectedValue);
     });
 
-    // Optional: Widget initialisieren, falls Wert bereits gesetzt wurde
-    window.addEventListener('message', function(event) {
-      if (event.data && event.data.type === 'control_widget' && event.data.name === 'value') {
+    // Listener, um vom Formular initialen Wert zu übernehmen
+    window.addEventListener("message", function(event) {
+      if (event.data && event.data.type === "control_widget" && event.data.name === "value") {
         select.value = event.data.value;
       }
     });
