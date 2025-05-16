@@ -1,47 +1,35 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mitarbeiter Dropdown Widget</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    select {
-      appearance: none;
-      background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e") no-repeat right 0.75rem center;
-      background-size: 1.25em;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Techniker Dropdown</title>
 </head>
-<body class="flex items-center justify-center min-h-screen bg-white p-4">
-  <div class="w-full">
-    <label class="block mb-2 text-sm font-medium text-gray-700">Mitarbeiter auswählen</label>
-    <select id="technikerDropdown" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-      <option value="">Bitte auswählen…</option>
-      <option>Option A</option>
-      <option>Option B</option>
-      <option>Option C</option>
-    </select>
-  </div>
+<body>
+  <label for="dropdown">Mitarbeiter auswählen:</label>
+  <select id="dropdown">
+    <option value="">Bitte wählen…</option>
+    <option value="Option A">Option A</option>
+    <option value="Option B">Option B</option>
+    <option value="Option C">Option C</option>
+  </select>
 
   <script>
-    const dropdown = document.getElementById("technikerDropdown");
+    const dropdown = document.getElementById("dropdown");
 
-    dropdown.addEventListener("change", () => {
-      const selectedValue = dropdown.value;
+    dropdown.addEventListener("change", function () {
+      const selected = dropdown.value;
 
-      // Sende den Wert an das übergeordnete Jotform-Formular
-      window.parent.postMessage(
-        {
-          action: "valueChanged",
-          value: selectedValue
-        },
-        "*"
-      );
+      // Sende den Wert an Jotform
+      parent.postMessage({
+        type: "control_widget",
+        name: "value",
+        value: selected
+      }, "*");
     });
 
-    // Optional: Aktuellen Wert setzen, wenn schon gespeichert (z. B. beim Nachladen)
-    window.addEventListener("message", function(event) {
-      if (event.data && event.data.type === "populate" && event.data.value) {
+    // Optional: Setze vorhandenen Wert beim Laden
+    window.addEventListener("message", function (event) {
+      if (event.data?.type === "setvalue" && event.data?.value) {
         dropdown.value = event.data.value;
       }
     });
